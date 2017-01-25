@@ -19,7 +19,7 @@ public class Log4JThreadContextTest {
     assertThat(ThreadContext.get("traceID"))
         .isNull();
 
-    Tracer tracer = Tracer.newBuilder().spanScoper(new Log4J2Scoper()).build();
+    Tracer tracer = Tracer.newBuilder().currentTraceContext(new Log4J2Scoper()).build();
 
     Span parent = tracer.newTrace();
     try (Tracer.SpanInScope wsParent = tracer.withSpanInScope(parent)) {

@@ -124,7 +124,7 @@ public final class Tracer {
      * Tracer#withSpanInScope(Span)}. By default a simple thread-local is used. Override to support
      * other mechanisms or to synchronize with other mechanisms such as SLF4J's MDC.
      */
-    public Builder spanScoper(CurrentTraceContext currentTraceContext) {
+    public Builder currentTraceContext(CurrentTraceContext currentTraceContext) {
       this.currentTraceContext = currentTraceContext;
       return this;
     }

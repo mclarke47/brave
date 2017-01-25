@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class FinagleContextInteropTest {
 
   @Test public void finagleBraveInterop() throws Exception {
-    Tracer tracer = Tracer.newBuilder().spanScoper(new FinagleCurrentTraceContext()).build();
+    Tracer tracer = Tracer.newBuilder().currentTraceContext(new FinagleCurrentTraceContext()).build();
 
     Span parent = tracer.newTrace(); // start a trace in Brave
     try (Tracer.SpanInScope wsParent = tracer.withSpanInScope(parent)) {
