@@ -1,9 +1,11 @@
 package com.github.kristofa.brave.jaxrs2;
 
 import com.github.kristofa.brave.Brave;
+import com.github.kristofa.brave.ClientResponseAdapter;
 import com.github.kristofa.brave.ClientResponseInterceptor;
 import com.github.kristofa.brave.http.HttpClientResponseAdapter;
 import com.github.kristofa.brave.http.HttpResponse;
+
 import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.ws.rs.client.ClientRequestContext;
@@ -65,6 +67,10 @@ public class BraveClientResponseFilter implements ClientResponseFilter {
     public void filter(ClientRequestContext clientRequestContext, ClientResponseContext clientResponseContext) throws IOException {
 
         final HttpResponse response = new JaxRs2HttpResponse(clientResponseContext);
-        responseInterceptor.handle(new HttpClientResponseAdapter(response));
+        responseInterceptor.handle(getAdapter(response));
+    }
+
+    protected ClientResponseAdapter getAdapter(HttpResponse response) {
+        return new HttpClientResponseAdapter(response);
     }
 }

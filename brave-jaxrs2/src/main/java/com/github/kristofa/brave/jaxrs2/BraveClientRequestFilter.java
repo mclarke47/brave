@@ -1,11 +1,13 @@
 package com.github.kristofa.brave.jaxrs2;
 
 import com.github.kristofa.brave.Brave;
+import com.github.kristofa.brave.ClientRequestAdapter;
 import com.github.kristofa.brave.ClientRequestInterceptor;
 import com.github.kristofa.brave.http.DefaultSpanNameProvider;
 import com.github.kristofa.brave.http.HttpClientRequest;
 import com.github.kristofa.brave.http.HttpClientRequestAdapter;
 import com.github.kristofa.brave.http.SpanNameProvider;
+
 import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.ws.rs.client.ClientRequestContext;
@@ -76,6 +78,10 @@ public class BraveClientRequestFilter implements ClientRequestFilter {
     @Override
     public void filter(ClientRequestContext clientRequestContext) throws IOException {
         final HttpClientRequest req = new JaxRs2HttpClientRequest(clientRequestContext);
-        requestInterceptor.handle(new HttpClientRequestAdapter(req, spanNameProvider));
+        requestInterceptor.handle(getAdapter(req, spanNameProvider));
+    }
+
+    protected ClientRequestAdapter getAdapter(HttpClientRequest req, SpanNameProvider spanNameProvider) {
+        return new HttpClientRequestAdapter(req, spanNameProvider);
     }
 }

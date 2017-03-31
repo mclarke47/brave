@@ -3,7 +3,12 @@ package com.github.kristofa.brave.jaxrs2;
 import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.http.DefaultSpanNameProvider;
 import com.github.kristofa.brave.http.SpanNameProvider;
+
 import javax.inject.Inject;
+import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.client.ClientResponseFilter;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.Provider;
@@ -55,12 +60,26 @@ public final class BraveTracingFeature implements Feature {
 
   @Override
   public boolean configure(FeatureContext context) {
-    context.register(
-        BraveClientRequestFilter.builder(brave).spanNameProvider(spanNameProvider).build());
-    context.register(BraveClientResponseFilter.create(brave));
-    context.register(
-        BraveContainerRequestFilter.builder(brave).spanNameProvider(spanNameProvider).build());
-    context.register(BraveContainerResponseFilter.create(brave));
+    context.register(getClientRequestFeature(brave, spanNameProvider));
+    context.register(getClientResponseFilter(brave));
+    context.register(getContainerRequestFilter(brave, spanNameProvider));
+    context.register(getContainerResponseFilter(brave));
     return true;
   }
+
+  protected ClientRequestFilter getClientRequestFeature(Brave brave, SpanNameProvider spanNameProvider) {
+    return BraveClientRequestFilter.builder(brave).spanNameProvider(spanNameProvider).build();
+  }
+
+  protected ClientResponseFilter getClientResponseFilter(Brave brave){
+    return BraveClientResponseFilter.create(brave);
+  }
+  protected ContainerRequestFilter getContainerRequestFilter(Brave brave, SpanNameProvider spanNameProvider){
+    return BraveContainerRequestFilter.builder(brave).spanNameProvider(spanNameProvider).build();
+  }
+
+  protected ContainerResponseFilter getContainerResponseFilter(Brave brave){
+    return BraveContainerResponseFilter.create(brave);
+  }
+
 }

@@ -5,7 +5,8 @@ import com.github.kristofa.brave.ServerResponseInterceptor;
 import com.github.kristofa.brave.ServerTracer;
 import com.github.kristofa.brave.http.HttpResponse;
 import com.github.kristofa.brave.http.HttpServerResponseAdapter;
-import java.io.IOException;
+import zipkin.Constants;
+
 import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -13,7 +14,7 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
-import zipkin.Constants;
+import java.io.IOException;
 
 import static com.github.kristofa.brave.internal.Util.checkNotNull;
 
@@ -75,6 +76,10 @@ public class BraveContainerResponseFilter implements ContainerResponseFilter {
         if (serverTracer != null && statusInfo.getFamily() == Response.Status.Family.SERVER_ERROR) {
             serverTracer.submitBinaryAnnotation(Constants.ERROR, statusInfo.getReasonPhrase());
         }
-        responseInterceptor.handle(new HttpServerResponseAdapter(httpResponse));
+        responseInterceptor.handle(getAdapter(httpResponse));
+    }
+
+    protected HttpServerResponseAdapter getAdapter(HttpResponse httpResponse) {
+        return new HttpServerResponseAdapter(httpResponse);
     }
 }

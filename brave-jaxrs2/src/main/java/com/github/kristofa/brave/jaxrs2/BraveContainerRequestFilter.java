@@ -6,16 +6,15 @@ import com.github.kristofa.brave.http.DefaultSpanNameProvider;
 import com.github.kristofa.brave.http.HttpServerRequest;
 import com.github.kristofa.brave.http.HttpServerRequestAdapter;
 import com.github.kristofa.brave.http.SpanNameProvider;
-
 import com.github.kristofa.brave.internal.Nullable;
-import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.annotation.Priority;
+import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.ext.Provider;
+import java.io.IOException;
 
 import static com.github.kristofa.brave.internal.Util.checkNotNull;
 
@@ -84,9 +83,13 @@ public class BraveContainerRequestFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
         HttpServerRequest request = new JaxRs2HttpServerRequest(containerRequestContext);
-        requestInterceptor.handle(new HttpServerRequestAdapter(request, spanNameProvider));
+        requestInterceptor.handle(getAdapter(request, spanNameProvider));
         if (maybeAddClientAddressFromRequest != null) {
             maybeAddClientAddressFromRequest.accept(containerRequestContext);
         }
+    }
+
+    protected HttpServerRequestAdapter getAdapter(HttpServerRequest request, SpanNameProvider spanNameProvider) {
+        return new HttpServerRequestAdapter(request, spanNameProvider);
     }
 }
